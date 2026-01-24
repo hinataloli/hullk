@@ -1,0 +1,37 @@
+name: Build Native AOT Windows
+# Chạy khi bạn push code lên GitHub hoặc nhấn chạy thủ công
+on: 
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    # Sử dụng máy chủ chạy Windows để vượt qua lỗi Cross-OS
+    runs-on: windows-latest
+
+    steps:
+      # 1. Tải mã nguồn từ repository của bạn xuống máy chủ
+      - uses: actions/checkout@v4
+
+      # 2. Cài đặt môi trường .NET 8
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # 3. Khôi phục các thư viện (NuGet)
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # 4. Biên dịch Native AOT ra file .exe duy nhất
+      - name: Publish Native AOT
+        run: dotnet publish -r win-x64 -c Release /p:PublishAot=true --self-contained true
+
+      # 5. Lưu file .exe thành sản phẩm (Artifact) để bạn tải về
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HostOM-Native-AOT
+          # Đường dẫn này phải khớp với tên project của bạn
+          path: bin/Release/net8.0-windows/win-x64/publish/*.exe

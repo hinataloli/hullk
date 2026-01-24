@@ -1,0 +1,6 @@
+[Bb]in/
+[Oo]bj/
+*.exe
+*.zip
+*.pdb
+.DS_Store
